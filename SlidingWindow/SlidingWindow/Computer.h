@@ -12,6 +12,10 @@ public:
 
 	std::string GetName() const;
 
+	void SendPackages(Computer& destination, uint16_t noOfPackages);
+	void Receive(Computer& source, Package& package);
+	//void Process
+
 	static std::string GetDefaultName();
 private:
 	const std::string kName;

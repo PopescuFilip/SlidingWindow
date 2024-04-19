@@ -1,6 +1,8 @@
-#include "SlidingWindow.h"
+#include "Network.h"
 
 int main()
 {
-	SlidingWindow window(8);
+	Computer source;
+	Computer destination;
+	Network::SendPackages(source, destination, 8);
 }

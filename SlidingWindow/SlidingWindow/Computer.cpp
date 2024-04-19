@@ -1,5 +1,5 @@
 #include "Computer.h"
-#include <sstream>
+#include "SlidingWindow.h"
 
 int Computer::sCounter = 0;
 
@@ -11,6 +11,19 @@ Computer::Computer() :
 std::string Computer::GetName() const
 {
     return kName;
+}
+
+void Computer::SendPackages(Computer& destination, uint16_t noOfPackages)
+{
+    SlidingWindow window(noOfPackages);
+    while (!window.AllPackagesSent())
+    {
+        window.Slide();
+    }
+}
+
+void Computer::Receive(Computer& source, Package& package)
+{
 }
 
 std::string Computer::GetDefaultName()
