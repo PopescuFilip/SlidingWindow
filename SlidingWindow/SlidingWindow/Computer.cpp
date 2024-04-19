@@ -2,9 +2,9 @@
 #include "SlidingWindow.h"
 #include "Timer.h"
 #include "Random.h"
+#include "Logger.h"
 
 #include <thread>
-#include <iostream>
 
 uint16_t Computer::sCounter = 0;
 
@@ -42,13 +42,13 @@ void Computer::Send(Computer& destination, Package& package)
         if (package.IsReceived())
         {
             std::this_thread::sleep_for(1s);
-            std::cout << "source: received acknowledgement for " << package.GetName() << '\n';
+            Logger::Log("source: acknowledgement for", package.GetName());
             return;
         }
 
         if (timer.ReachedThreshold())
         {
-            std::cout << package.GetName() << " timed out\n";
+            Logger::Log(package.GetName(), "timed out");
             timer.Start();
             std::thread thread(&Computer::Receive, &destination, std::ref(package));
             thread.detach();
@@ -61,13 +61,13 @@ void Computer::Send(Computer& destination, Package& package)
 void Computer::Receive(Package& package)
 {
     std::this_thread::sleep_for(2s);
-    std::cout << "destination: received " << package.GetName() << '\n';
+    Logger::Log("destination: received", package.GetName());
 
     int chanceOfCorruption = Random::GetRandom(0, 4);
     if (chanceOfCorruption != 0)
         package.SetReceived(true);
     else
-        std::cout << "acknowledgement corrupted";
+        Logger::Log(package.GetName(), ": acknowledgement corrupted");
 }
 
 std::string Computer::GetDefaultName()
