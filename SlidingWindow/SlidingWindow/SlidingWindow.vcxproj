@@ -132,14 +132,18 @@
     <ClCompile Include="Computer.cpp" />
     <ClCompile Include="Network.cpp" />
     <ClCompile Include="Package.cpp" />
+    <ClCompile Include="Random.cpp" />
     <ClCompile Include="SlidingWindow.cpp" />
     <ClCompile Include="Source.cpp" />
+    <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Computer.h" />
     <ClInclude Include="Network.h" />
     <ClInclude Include="Package.h" />
+    <ClInclude Include="Random.h" />
     <ClInclude Include="SlidingWindow.h" />
+    <ClInclude Include="Timer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -39,6 +39,6 @@ bool SlidingWindow::AllPackagesSent() const
 }
 void SlidingWindow::Slide()
 {
-	while (!AllPackagesSent() || m_packagesToSend[m_startOfWindow].IsReceived())
+	while (!AllPackagesSent() and m_packagesToSend[m_startOfWindow].IsReceived())
 		m_startOfWindow++;
 }

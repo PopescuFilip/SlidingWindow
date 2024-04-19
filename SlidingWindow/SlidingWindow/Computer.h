@@ -13,6 +13,7 @@ public:
 	std::string GetName() const;
 
 	void SendPackages(Computer& destination, uint16_t noOfPackages);
+	void Send(Computer& destination, Package& package);
 	void Receive(Computer& source, Package& package);
 	//void Process
 
@@ -22,6 +23,6 @@ private:
 	std::vector<Package> receivedPackages;
 
 private:
-	static int sCounter;
+	static uint16_t sCounter;
 };
 std::ostream& operator<<(std::ostream& os, const Computer& c);
