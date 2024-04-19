@@ -24,6 +24,7 @@ void Computer::SendPackages(Computer& destination, uint16_t noOfPackages)
     while (!window.AllPackagesSent())
     {
         SendLoop(destination, window[window.GetStartWindowIndex()]);
+        std::this_thread::sleep_for(3s);
         window.Slide();
     }
 }
