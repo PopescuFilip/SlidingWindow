@@ -14,7 +14,7 @@ public:
 
 	void SendPackages(Computer& destination, uint16_t noOfPackages);
 	void Send(Computer& destination, Package& package);
-	void Receive(Computer& source, Package& package);
+	void Receive(Package& package);
 	//void Process
 
 	static std::string GetDefaultName();

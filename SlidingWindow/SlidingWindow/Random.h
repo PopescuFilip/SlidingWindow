@@ -1,3 +1,7 @@
-#include <random>
+#pragma once
 
-int GetRandom(int lowerLimit, int upperLimit);
+class Random
+{
+public:
+	static int GetRandom(int lowerLimit, int upperLimit);
+};

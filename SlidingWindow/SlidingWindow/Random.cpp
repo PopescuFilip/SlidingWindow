@@ -1,6 +1,8 @@
 #include "Random.h"
 
-int GetRandom(int lowerLimit, int upperLimit)
+#include <random>
+
+int Random::GetRandom(int lowerLimit, int upperLimit)
 {
     std::random_device rd;
     std::mt19937 gen(rd());

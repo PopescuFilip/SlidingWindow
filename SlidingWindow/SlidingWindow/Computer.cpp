@@ -1,6 +1,7 @@
 #include "Computer.h"
 #include "SlidingWindow.h"
 #include "Timer.h"
+#include "Random.h"
 
 #include <thread>
 #include <iostream>
@@ -33,18 +34,23 @@ void Computer::Send(Computer& destination, Package& package)
     Timer timer(4);
     timer.Start();
 
-    std::thread thread(&Computer::Receive, &destination, std::ref(*this), std::ref(package));
+    std::thread thread(&Computer::Receive, &destination, std::ref(package));
     thread.detach();
 
     while (true)
     {
         if (package.IsReceived())
+        {
+            std::this_thread::sleep_for(1s);
+            std::cout << "source: received acknowledgement for " << package.GetName() << '\n';
             return;
+        }
 
         if (timer.ReachedThreshold())
         {
+            std::cout << package.GetName() << " timed out\n";
             timer.Start();
-            std::thread thread(&Computer::Receive, &destination, std::ref(*this), std::ref(package));
+            std::thread thread(&Computer::Receive, &destination, std::ref(package));
             thread.detach();
         }
 
@@ -52,11 +58,16 @@ void Computer::Send(Computer& destination, Package& package)
     }
 }
 
-void Computer::Receive(Computer& source, Package& package)
+void Computer::Receive(Package& package)
 {
     std::this_thread::sleep_for(2s);
-    std::cout << "destination received " << package.GetName() << '\n';
-    package.SetReceived(true);
+    std::cout << "destination: received " << package.GetName() << '\n';
+
+    int chanceOfCorruption = Random::GetRandom(0, 4);
+    if (chanceOfCorruption != 0)
+        package.SetReceived(true);
+    else
+        std::cout << "acknowledgement corrupted";
 }
 
 std::string Computer::GetDefaultName()
