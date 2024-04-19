@@ -1,4 +1,4 @@
-#include "Computer.h"
+﻿#include "Computer.h"
 #include "SlidingWindow.h"
 #include "Timer.h"
 #include "Random.h"
@@ -23,26 +23,24 @@ void Computer::SendPackages(Computer& destination, uint16_t noOfPackages)
     SlidingWindow window(noOfPackages);
     while (!window.AllPackagesSent())
     {
-        Send(destination, window[window.GetStartWindowIndex()]);
+        SendLoop(destination, window[window.GetStartWindowIndex()]);
         window.Slide();
     }
 }
 
-void Computer::Send(Computer& destination, Package& package)
+void Computer::SendLoop(Computer& destination, Package& package)
 {
     static const uint16_t timeoutSeconds = 4;
     Timer timer(4);
     timer.Start();
-
-    std::thread thread(&Computer::Receive, &destination, std::ref(package));
-    thread.detach();
+    Send(destination, package);
 
     while (true)
     {
         if (package.IsReceived())
         {
             std::this_thread::sleep_for(1s);
-            Logger::Log("source: acknowledgement for", package.GetName());
+            Logger::Log("source: acknowledgement for", package.GetName(), '!');
             return;
         }
 
@@ -50,20 +48,34 @@ void Computer::Send(Computer& destination, Package& package)
         {
             Logger::Log(package.GetName(), "timed out");
             timer.Start();
-            std::thread thread(&Computer::Receive, &destination, std::ref(package));
-            thread.detach();
+            Send(destination, package);
         }
 
         std::this_thread::sleep_for(1s);
     }
 }
 
+void Computer::Send(Computer& destination, Package& package)
+{
+    Logger::Log("source ->", package.GetName());
+    
+    int chanceOfCorruption = Random::GetRandom(0, 5);
+    if (chanceOfCorruption != 0)
+    {
+        std::thread thread(&Computer::Receive, &destination, std::ref(package));
+        thread.detach();
+    }
+    else
+        Logger::Log(package.GetName(), ": corrupted");
+    
+}
+
 void Computer::Receive(Package& package)
 {
     std::this_thread::sleep_for(2s);
-    Logger::Log("destination: received", package.GetName());
+    Logger::Log("destination: received", package.GetName(), '!');
 
-    int chanceOfCorruption = Random::GetRandom(0, 4);
+    int chanceOfCorruption = Random::GetRandom(0, 5);
     if (chanceOfCorruption != 0)
         package.SetReceived(true);
     else

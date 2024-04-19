@@ -13,6 +13,7 @@ public:
 	std::string GetName() const;
 
 	void SendPackages(Computer& destination, uint16_t noOfPackages);
+	void SendLoop(Computer& destination, Package& package);
 	void Send(Computer& destination, Package& package);
 	void Receive(Package& package);
 	//void Process
