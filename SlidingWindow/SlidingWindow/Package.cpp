@@ -4,7 +4,8 @@ uint16_t Package::sPackageCounter = 1;
 
 Package::Package():
 	m_name{ GetDefaultName() + std::to_string(sPackageCounter)},
-	m_received{ false }
+	m_received{ false },
+	m_sent{ false }
 {
 	sPackageCounter++;
 }
@@ -19,9 +20,19 @@ bool Package::IsReceived() const
 	return m_received;
 }
 
-void Package::SetReceived(bool received)
+bool Package::IsSent() const
 {
-	m_received = received;
+	return false;
+}
+
+void Package::Receive()
+{
+	m_received = true;
+}
+
+void Package::Send()
+{
+	m_sent = true;
 }
 
 std::string Package::GetDefaultName()

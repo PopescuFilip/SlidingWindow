@@ -24,7 +24,7 @@ void Computer::SendPackages(Computer& destination, uint16_t noOfPackages)
     while (!window.AllPackagesSent())
     {
         SendLoop(destination, window[window.GetStartWindowIndex()]);
-        std::this_thread::sleep_for(3s);
+        //std::this_thread::sleep_for(3s);
         window.Slide();
     }
 }
@@ -32,8 +32,11 @@ void Computer::SendPackages(Computer& destination, uint16_t noOfPackages)
 void Computer::SendLoop(Computer& destination, Package& package)
 {
     static const uint16_t timeoutSeconds = 4;
+    
     Timer timer(4);
     timer.Start();
+    
+    package.Send();
     Send(destination, package);
 
     while (true)
@@ -78,7 +81,7 @@ void Computer::Receive(Package& package)
 
     int chanceOfCorruption = Random::GetRandom(0, 5);
     if (chanceOfCorruption != 0)
-        package.SetReceived(true);
+        package.Receive();
     else
         Logger::Log(package.GetName(), ": acknowledgement corrupted");
 }
