@@ -3,7 +3,7 @@
 uint16_t Package::sPackageCounter = 1;
 
 Package::Package():
-	m_name{ GetDefaultName() + std::to_string(sPackageCounter)},
+	m_number{ sPackageCounter },
 	m_received{ false },
 	m_sent{ false }
 {
@@ -12,7 +12,7 @@ Package::Package():
 
 std::string Package::GetName() const
 {
-	return m_name;
+	return GetDefaultName() + std::to_string(m_number);
 }
 
 bool Package::IsReceived() const
@@ -22,7 +22,7 @@ bool Package::IsReceived() const
 
 bool Package::IsSent() const
 {
-	return false;
+	return m_sent;
 }
 
 void Package::Receive()
@@ -30,12 +30,22 @@ void Package::Receive()
 	m_received = true;
 }
 
-void Package::Send()
+void Package::SetSent(bool sent)
 {
-	m_sent = true;
+	m_sent = sent;
 }
 
 std::string Package::GetDefaultName()
 {
 	return "package";
+}
+
+bool Package::operator<(const Package& other) const
+{
+	return this->m_number < other.m_number;
+}
+
+bool Package::operator==(const Package& other) const
+{
+	return this->m_number == other.m_number;
 }

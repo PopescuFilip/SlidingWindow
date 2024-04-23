@@ -13,15 +13,18 @@ public:
 	std::string GetName() const;
 
 	void SendPackages(Computer& destination, uint16_t noOfPackages);
-	void SendLoop(Computer& destination, Package& package);
 	void Send(Computer& destination, Package& package);
 	void Receive(Package& package);
 	//void Process
 
+	bool HasReceived(const Package& package) const;
+	void ShowReceivedPackages();
+	void SortPackages();
+
 	static std::string GetDefaultName();
 private:
 	const std::string kName;
-	std::vector<Package> receivedPackages;
+	std::vector<Package> m_receivedPackages;
 
 private:
 	static uint16_t sCounter;

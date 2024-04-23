@@ -4,5 +4,5 @@ int main()
 {
 	Computer source;
 	Computer destination;
-	Network::SendPackages(source, destination, 8);
+	Network::SendPackages(source, destination, 7);
 }

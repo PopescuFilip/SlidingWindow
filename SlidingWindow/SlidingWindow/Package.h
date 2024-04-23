@@ -11,11 +11,14 @@ public:
 	bool IsSent() const;
 
 	void Receive();
-	void Send();
+	void SetSent(bool sent);
 
 	static std::string GetDefaultName();
+
+	bool operator <(const Package& other) const;
+	bool operator ==(const Package& other) const;
 private:
-	const std::string m_name;
+	uint16_t m_number;
 	bool m_received;
 	bool m_sent;
 	static uint16_t sPackageCounter;

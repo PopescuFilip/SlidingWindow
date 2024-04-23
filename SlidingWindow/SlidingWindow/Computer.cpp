@@ -5,6 +5,7 @@
 #include "Logger.h"
 
 #include <thread>
+#include <algorithm>
 
 uint16_t Computer::sCounter = 0;
 
@@ -21,69 +22,99 @@ std::string Computer::GetName() const
 void Computer::SendPackages(Computer& destination, uint16_t noOfPackages)
 {
     SlidingWindow window(noOfPackages);
+
     while (!window.AllPackagesSent())
     {
-        SendLoop(destination, window[window.GetStartWindowIndex()]);
-        //std::this_thread::sleep_for(3s);
+        std::vector<size_t> packages{ std::move(window.GetUnsentIndices()) };
+        if (!packages.size())
+            return;
+        std::vector<std::thread> threads;
+        std::ranges::for_each(packages, [&](const size_t& index)
+            {
+                std::this_thread::sleep_for(0.3s);
+                std::thread thread([&]() {
+                    destination.Send(destination, window[index]);
+                    });
+
+                threads.push_back(std::move(thread));
+            });
+
+        std::ranges::for_each(threads, [](std::thread& thread)
+            {
+                thread.join();
+                //std::this_thread::sleep_for(1s);
+            });
+        //std::this_thread::sleep_for(4s);
         window.Slide();
     }
-}
-
-void Computer::SendLoop(Computer& destination, Package& package)
-{
-    static const uint16_t timeoutSeconds = 4;
-    
-    Timer timer(4);
-    timer.Start();
-    
-    package.Send();
-    Send(destination, package);
-
-    while (true)
-    {
-        if (package.IsReceived())
-        {
-            std::this_thread::sleep_for(1s);
-            Logger::Log("source: acknowledgement for", package.GetName(), '!');
-            return;
-        }
-
-        if (timer.ReachedThreshold())
-        {
-            Logger::Log(package.GetName(), "timed out");
-            timer.Start();
-            Send(destination, package);
-        }
-
-        std::this_thread::sleep_for(1s);
-    }
+    destination.ShowReceivedPackages();
 }
 
 void Computer::Send(Computer& destination, Package& package)
 {
+    static const uint16_t timeoutSeconds = 4;
+
+    package.SetSent(true);
+
     Logger::Log("source ->", package.GetName());
-    
-    int chanceOfCorruption = Random::GetRandom(0, 5);
+
+    int chanceOfCorruption = Random::GetRandom(0, 6);
     if (chanceOfCorruption != 0)
-    {
-        std::thread thread(&Computer::Receive, &destination, std::ref(package));
-        thread.detach();
-    }
+        destination.Receive(package);
     else
         Logger::Log(package.GetName(), ": corrupted");
-    
+
+    if (package.IsReceived())
+    {
+        Logger::Log("source: acknowledgement for", package.GetName(), '!');
+        return;
+    }
+    std::this_thread::sleep_for(3s);
+    Logger::Log(package.GetName(), "timed out");
+    package.SetSent(false);
 }
 
 void Computer::Receive(Package& package)
 {
-    std::this_thread::sleep_for(2s);
-    Logger::Log("destination: received", package.GetName(), '!');
+    std::this_thread::sleep_for(3s);
+    
+    if (HasReceived(package))
+        Logger::Log("destination: received and ignored", package.GetName());
+    else
+    {
+        Logger::Log("destination: received", package.GetName(), '!');
+        m_receivedPackages.push_back(package);
+    }
 
-    int chanceOfCorruption = Random::GetRandom(0, 5);
+    std::this_thread::sleep_for(3s);
+
+    int chanceOfCorruption = Random::GetRandom(0, 6);
     if (chanceOfCorruption != 0)
         package.Receive();
     else
         Logger::Log(package.GetName(), ": acknowledgement corrupted");
+}
+
+bool Computer::HasReceived(const Package& package) const
+{
+    for (size_t i = 0; i < m_receivedPackages.size(); i++)
+    {
+        if (m_receivedPackages[i].GetName() == package.GetName())
+            return true;
+    }
+    return false;
+}
+
+void Computer::ShowReceivedPackages()
+{
+    std::sort(m_receivedPackages.begin(), m_receivedPackages.end());
+    std::cout << "\n packages received:\n ";
+    std::ranges::for_each(m_receivedPackages, [](const Package& pckg) {std::cout << pckg.GetName() << "\n "; });
+}
+
+void Computer::SortPackages()
+{
+    //std::sort(m_receivedPackages.begin(), m_receivedPackages.end());
 }
 
 std::string Computer::GetDefaultName()
